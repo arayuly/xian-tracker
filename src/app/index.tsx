@@ -1,98 +1,65 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ProgressCard } from '@/components/ProgressCard';
+import { Screen } from '@/components/Screen';
+import { colors, fonts } from '@/constants/xian';
+import { useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+// Пока цели заданы вручную. На шаге 3 они будут браться из таблицы уровней.
+const PUSHUPS_GOAL = 40;
+const PAGES_GOAL = 15;
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function PathScreen() {
+  const [pushups, setPushups] = useState(0);
+  const [pages, setPages] = useState(0);
+
+  const canBreakthrough = pushups >= PUSHUPS_GOAL && pages >= PAGES_GOAL;
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <Screen seal="道" title="Путь">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View>
+          <Text style={styles.realm}>Конденсация Ци</Text>
+          <Text style={styles.layer}>1-й слой</Text>
+        </View>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        <ProgressCard
+          title="Отжимания"
+          unit="раз"
+          current={pushups}
+          goal={PUSHUPS_GOAL}
+          onAdd={(n) => setPushups(pushups + n)}
+        />
+        <ProgressCard
+          title="Чтение"
+          unit="стр."
+          current={pages}
+          goal={PAGES_GOAL}
+          onAdd={(n) => setPages(pages + n)}
+        />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        <Pressable
+          style={[styles.breakthrough, !canBreakthrough && styles.breakthroughOff]}
+          disabled={!canBreakthrough}
+          onPress={() => Alert.alert('Прорыв!', 'Скоро здесь будет новый уровень')}
+        >
+          <Text style={styles.breakthroughText}>突破 · Прорыв</Text>
+        </Pressable>
+      </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  content: { gap: 20, paddingBottom: 24 },
+  realm: { fontSize: 22, letterSpacing: 1, color: colors.ink, fontFamily: fonts.serif },
+  layer: { fontSize: 14, marginTop: 4, color: colors.inkSoft, fontFamily: fonts.serif },
+  breakthrough: {
+    marginTop: 8,
+    paddingVertical: 16,
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    borderRadius: 4,
+    backgroundColor: colors.seal,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  breakthroughOff: { backgroundColor: colors.line },
+  breakthroughText: { fontSize: 16, letterSpacing: 2, color: colors.paper, fontFamily: fonts.serif },
 });
