@@ -1,4 +1,5 @@
 import { colors, fonts } from '@/constants/xian';
+import { PlayerProvider } from '@/state/player';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ColorValue, Text } from 'react-native';
@@ -9,7 +10,7 @@ function Glyph({ char, color }: { char: string; color: ColorValue }) {
 
 export default function RootLayout() {
   return (
-    <>
+    <PlayerProvider>
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -33,6 +34,6 @@ export default function RootLayout() {
         />
       </Tabs>
       <StatusBar style="dark" />
-    </>
+    </PlayerProvider>
   );
 }
