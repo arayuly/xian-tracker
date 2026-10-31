@@ -1,4 +1,5 @@
 import { LEVELS } from '@/constants/levels';
+import { syncProfile } from '@/lib/players';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
@@ -56,6 +57,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (!loaded) return;
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data)).catch(() => { });
     }, [data, loaded]);
+
+    // 3. Отправляем имя и уровень на сервер (через 1 секунду после последнего изменения)
+    useEffect(() => {
+        if (!loaded || !data.name.trim()) return;
+        const timer = setTimeout(() => {
+            syncProfile(data.name, data.levelIndex).catch((e) => console.log('sync error:', e));
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [loaded, data.name, data.levelIndex]);
 
     if (!loaded) return null;
 
