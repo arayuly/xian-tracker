@@ -2,13 +2,11 @@ import { ProgressCard } from '@/components/ProgressCard';
 import { Screen } from '@/components/Screen';
 import { LEVELS } from '@/constants/levels';
 import { colors, fonts } from '@/constants/xian';
-import { useState } from 'react';
+import { usePlayer } from '@/state/player';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function PathScreen() {
-  const [levelIndex, setLevelIndex] = useState(0);
-  const [pushups, setPushups] = useState(0);
-  const [pages, setPages] = useState(0);
+  const { levelIndex, pushups, pages, addPushups, addPages, breakthrough } = usePlayer();
 
   const level = LEVELS[levelIndex];
   const isMax = levelIndex === LEVELS.length - 1;
@@ -16,10 +14,7 @@ export default function PathScreen() {
 
   function handleBreakthrough() {
     const next = LEVELS[levelIndex + 1];
-    // излишек переносится на следующий уровень
-    setPushups(pushups - level.pushups);
-    setPages(pages - level.pages);
-    setLevelIndex(levelIndex + 1);
+    breakthrough();
     Alert.alert('Прорыв!', `${next.realm} · ${next.stage}`);
   }
 
@@ -44,14 +39,14 @@ export default function PathScreen() {
               unit="раз"
               current={pushups}
               goal={level.pushups}
-              onAdd={(n) => setPushups(pushups + n)}
+              onAdd={addPushups}
             />
             <ProgressCard
               title="Чтение"
               unit="стр."
               current={pages}
               goal={level.pages}
-              onAdd={(n) => setPages(pages + n)}
+              onAdd={addPages}
             />
 
             <Pressable
