@@ -7,18 +7,22 @@ const STORAGE_KEY = 'xian-player-v1';
 
 type SavedData = {
     name: string;
-    levelIndex: number; // уровень культивации (отжимания), его видят другие
-    daoLevelIndex: number; // уровень Дао (чтение), виден только тебе
+    levelIndex: number; // уровень культивации (отжимания)
+    daoLevelIndex: number; // уровень Дао (чтение)
     pushups: number; // прогресс отжиманий на текущем уровне
     pages: number; // прогресс чтения на текущем уровне Дао
     totalPushups: number;
     totalPages: number;
+    lastPushups: number; // последняя запись отжиманий (для отмены), 0 если отменять нечего
+    lastPages: number; // последняя запись страниц
 };
 
 type PlayerContextValue = SavedData & {
     setName: (name: string) => void;
     addPushups: (n: number) => void;
     addPages: (n: number) => void;
+    undoPushups: () => void;
+    undoPages: () => void;
     breakthroughBody: () => void;
     breakthroughDao: () => void;
 };
@@ -31,6 +35,8 @@ const DEFAULT_DATA: SavedData = {
     pages: 0,
     totalPushups: 0,
     totalPages: 0,
+    lastPushups: 0,
+    lastPages: 0,
 };
 
 // Защита от неверных чисел в сохранённых данных
@@ -69,7 +75,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }, [data, loaded]);
 
     // 3. Отправляем имя и оба уровня на сервер (через 1 секунду после последнего изменения)
-    //    Уровень Дао (daoLevelIndex) намеренно не отправляем: он приватный.
     useEffect(() => {
         if (!loaded || !data.name.trim()) return;
         const timer = setTimeout(() => {
@@ -85,23 +90,60 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const value: PlayerContextValue = {
         ...data,
         setName: (name) => setData((d) => ({ ...d, name })),
+
         addPushups: (n) =>
-            setData((d) => ({ ...d, pushups: d.pushups + n, totalPushups: d.totalPushups + n })),
+            setData((d) => ({
+                ...d,
+                pushups: d.pushups + n,
+                totalPushups: d.totalPushups + n,
+                lastPushups: n,
+            })),
         addPages: (n) =>
-            setData((d) => ({ ...d, pages: d.pages + n, totalPages: d.totalPages + n })),
+            setData((d) => ({
+                ...d,
+                pages: d.pages + n,
+                totalPages: d.totalPages + n,
+                lastPages: n,
+            })),
+
+        undoPushups: () =>
+            setData((d) => ({
+                ...d,
+                pushups: Math.max(0, d.pushups - d.lastPushups),
+                totalPushups: Math.max(0, d.totalPushups - d.lastPushups),
+                lastPushups: 0,
+            })),
+        undoPages: () =>
+            setData((d) => ({
+                ...d,
+                pages: Math.max(0, d.pages - d.lastPages),
+                totalPages: Math.max(0, d.totalPages - d.lastPages),
+                lastPages: 0,
+            })),
+
         breakthroughBody: () =>
             setData((d) => {
                 const level = LEVELS[d.levelIndex];
                 const isMax = d.levelIndex >= LEVELS.length - 1;
                 if (isMax || d.pushups < level.pushups) return d;
-                return { ...d, levelIndex: d.levelIndex + 1, pushups: d.pushups - level.pushups };
+                return {
+                    ...d,
+                    levelIndex: d.levelIndex + 1,
+                    pushups: d.pushups - level.pushups,
+                    lastPushups: 0,
+                };
             }),
         breakthroughDao: () =>
             setData((d) => {
                 const level = LEVELS[d.daoLevelIndex];
                 const isMax = d.daoLevelIndex >= LEVELS.length - 1;
                 if (isMax || d.pages < level.pages) return d;
-                return { ...d, daoLevelIndex: d.daoLevelIndex + 1, pages: d.pages - level.pages };
+                return {
+                    ...d,
+                    daoLevelIndex: d.daoLevelIndex + 1,
+                    pages: d.pages - level.pages,
+                    lastPages: 0,
+                };
             }),
     };
 
