@@ -14,8 +14,9 @@ function Stat({ label, value }: { label: string; value: number }) {
 }
 
 export default function ProfileScreen() {
-    const { name, setName, levelIndex, totalPushups, totalPages } = usePlayer();
+    const { name, setName, levelIndex, daoLevelIndex, totalPushups, totalPages } = usePlayer();
     const level = LEVELS[levelIndex];
+    const daoLevel = LEVELS[daoLevelIndex];
     const displayName = name.trim() || 'Безымянный';
 
     return (
@@ -38,6 +39,13 @@ export default function ProfileScreen() {
                     <Text style={styles.previewName}>{displayName}</Text>
                     <Text style={styles.previewLevel}>
                         {level.realm} · {level.stage}
+                    </Text>
+                </View>
+
+                <View style={styles.card}>
+                    <Text style={styles.label}>Дао · 道</Text>
+                    <Text style={styles.daoLevel}>
+                        {daoLevel.realm} · {daoLevel.stage}
                     </Text>
                 </View>
 
@@ -71,6 +79,7 @@ const styles = StyleSheet.create({
     },
     previewName: { fontSize: 22, color: colors.ink, fontFamily: fonts.serif },
     previewLevel: { fontSize: 15, color: colors.seal, fontFamily: fonts.serif },
+    daoLevel: { fontSize: 17, color: colors.ink, fontFamily: fonts.serif },
     stats: { flexDirection: 'row', gap: 32 },
     stat: { gap: 4 },
     statValue: { fontSize: 28, color: colors.ink, fontFamily: fonts.serif },
