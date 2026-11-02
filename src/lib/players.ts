@@ -21,3 +21,21 @@ export async function syncProfile(name: string, levelIndex: number) {
     });
     if (error) throw error;
 }
+
+export type PlayerRow = { id: string; name: string; level_index: number };
+
+// Загружает всех игроков с именем: сначала самые высокие уровни
+export async function fetchPlayers(): Promise<{ players: PlayerRow[]; myId: string }> {
+    const myId = await ensureUserId();
+
+    const { data, error } = await supabase
+        .from('players')
+        .select('id, name, level_index')
+        .neq('name', '')
+        .order('level_index', { ascending: false })
+        .order('name', { ascending: true })
+        .limit(100);
+    if (error) throw error;
+
+    return { players: (data ?? []) as PlayerRow[], myId };
+}
