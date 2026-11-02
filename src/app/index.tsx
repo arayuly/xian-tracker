@@ -10,8 +10,12 @@ export default function PathScreen() {
     daoLevelIndex,
     pushups,
     pages,
+    lastPushups,
+    lastPages,
     addPushups,
     addPages,
+    undoPushups,
+    undoPages,
     breakthroughBody,
     breakthroughDao,
   } = usePlayer();
@@ -26,7 +30,9 @@ export default function PathScreen() {
           progress={pushups}
           cardTitle="Отжимания"
           unit="раз"
+          lastAdded={lastPushups}
           onAdd={addPushups}
+          onUndo={undoPushups}
           onBreakthrough={breakthroughBody}
         />
 
@@ -39,7 +45,9 @@ export default function PathScreen() {
           progress={pages}
           cardTitle="Чтение"
           unit="стр."
+          lastAdded={lastPages}
           onAdd={addPages}
+          onUndo={undoPages}
           onBreakthrough={breakthroughDao}
         />
       </ScrollView>
