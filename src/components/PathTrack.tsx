@@ -12,7 +12,9 @@ type Props = {
     progress: number;
     cardTitle: string;
     unit: string;
+    lastAdded: number; // последняя запись (0, если отменять нечего)
     onAdd: (amount: number) => void;
+    onUndo: () => void;
     onBreakthrough: () => void;
 };
 
@@ -23,7 +25,9 @@ export function PathTrack({
     progress,
     cardTitle,
     unit,
+    lastAdded,
     onAdd,
+    onUndo,
     onBreakthrough,
 }: Props) {
     const [showCelebration, setShowCelebration] = useState(false);
@@ -65,6 +69,15 @@ export function PathTrack({
                         goal={goal}
                         onAdd={onAdd}
                     />
+
+                    {lastAdded > 0 && (
+                        <Pressable onPress={onUndo} hitSlop={10} style={styles.undoWrap}>
+                            <Text style={styles.undo}>
+                                Отменить последнее: +{lastAdded} {unit}
+                            </Text>
+                        </Pressable>
+                    )}
+
                     <Pressable
                         style={[styles.breakthrough, !canBreakthrough && styles.breakthroughOff]}
                         disabled={!canBreakthrough}
@@ -92,6 +105,13 @@ const styles = StyleSheet.create({
     realm: { fontSize: 22, letterSpacing: 1, marginTop: 4, color: colors.ink, fontFamily: fonts.serif },
     stage: { fontSize: 14, marginTop: 4, color: colors.inkSoft, fontFamily: fonts.serif },
     summit: { fontSize: 18, color: colors.seal, fontFamily: fonts.serif },
+    undoWrap: { alignSelf: 'flex-start' },
+    undo: {
+        fontSize: 13,
+        color: colors.inkSoft,
+        fontFamily: fonts.serif,
+        textDecorationLine: 'underline',
+    },
     breakthrough: {
         paddingVertical: 16,
         alignItems: 'center',
