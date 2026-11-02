@@ -1,7 +1,9 @@
+import { BreakthroughModal } from '@/components/BreakthroughModal';
 import { ProgressCard } from '@/components/ProgressCard';
 import { LEVELS } from '@/constants/levels';
 import { colors, fonts } from '@/constants/xian';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 
 type Props = {
     label: string; // «Культивация» или «Дао · 道»
@@ -24,6 +26,9 @@ export function PathTrack({
     onAdd,
     onBreakthrough,
 }: Props) {
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [reached, setReached] = useState({ realm: '', stage: '' });
+
     const level = LEVELS[levelIndex];
     const goal = level[goalKey];
     const isMax = levelIndex === LEVELS.length - 1;
@@ -32,7 +37,9 @@ export function PathTrack({
     function handlePress() {
         const next = LEVELS[levelIndex + 1];
         onBreakthrough();
-        Alert.alert('Прорыв!', `${label}: ${next.realm} · ${next.stage}`);
+        Vibration.vibrate(60);
+        setReached({ realm: next.realm, stage: next.stage });
+        setShowCelebration(true);
     }
 
     return (
@@ -67,6 +74,14 @@ export function PathTrack({
                     </Pressable>
                 </>
             )}
+
+            <BreakthroughModal
+                visible={showCelebration}
+                label={label}
+                realm={reached.realm}
+                stage={reached.stage}
+                onClose={() => setShowCelebration(false)}
+            />
         </View>
     );
 }
