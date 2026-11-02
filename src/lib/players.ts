@@ -10,13 +10,14 @@ export async function ensureUserId(): Promise<string> {
     return signIn.user.id;
 }
 
-// Отправляет имя и уровень на сервер (создаёт или обновляет свою строку)
-export async function syncProfile(name: string, levelIndex: number) {
+// Отправляет имя и оба уровня на сервер (создаёт или обновляет свою строку)
+export async function syncProfile(name: string, levelIndex: number, daoLevelIndex: number) {
     const id = await ensureUserId();
     const { error } = await supabase.from('players').upsert({
         id,
         name: name.trim(),
         level_index: levelIndex,
+        dao_level_index: daoLevelIndex,
         updated_at: new Date().toISOString(),
     });
     if (error) throw error;
