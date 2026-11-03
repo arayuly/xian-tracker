@@ -7,10 +7,6 @@ export type Level = {
     pages: number;
 };
 
-// Формулы сложности: n — номер уровня (1, 2, 3 ...)
-const pushupsFor = (n: number) => 30 + 10 * n;
-const pagesFor = (n: number) => 10 + 5 * n;
-
 // Варианты стадий
 const LAYERS_15 = Array.from({ length: 15 }, (_, i) => `${i + 1}-й слой`);
 const STAGES_3 = ['Ранняя стадия', 'Средняя стадия', 'Поздняя стадия'];
@@ -70,8 +66,28 @@ export const LEVELS: Level[] = STEPS.flatMap((step) =>
             stage,
         })),
     ),
-).map((base, i) => ({
-    ...base,
-    pushups: pushupsFor(i + 1),
-    pages: pagesFor(i + 1),
-}));
+).map((base, i) => {
+    const n = i + 1; // Номер уровня (от 1 и дальше)
+
+    // Плавный старт для первых уровней (Конденсация Ци), 
+    // затем более крутой экспоненциальный рост для высших сфер
+    let pushups: number;
+    let pages: number;
+
+    if (n <= 15) {
+        // Первые 15 уровней (Конденсация Ци): старт с 15 отжиманий, шаг прироста около +2
+        pushups = Math.round(15 + Math.pow(n, 1.3) * 1.5);
+        pages = Math.round(5 + n * 1.2);
+    } else {
+        // После 15 уровня сложность начинает расти ощутимее (переход к Закладке Фундамента и выше)
+        const scale = n - 15;
+        pushups = Math.round(65 + Math.pow(scale, 1.25) * 8);
+        pages = Math.round(23 + scale * 1.5);
+    }
+
+    return {
+        ...base,
+        pushups,
+        pages,
+    };
+});
