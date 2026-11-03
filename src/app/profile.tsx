@@ -37,6 +37,7 @@ export default function ProfileScreen() {
                 <View style={styles.card}>
                     <Text style={styles.label}>Так тебя увидят другие</Text>
                     <Text style={styles.previewName}>{displayName}</Text>
+                    <Text style={styles.previewStep}>{level.step}</Text>
                     <Text style={styles.previewLevel}>
                         {level.realm} · {level.stage}
                     </Text>
@@ -44,6 +45,7 @@ export default function ProfileScreen() {
 
                 <View style={styles.card}>
                     <Text style={styles.label}>Дао · 道</Text>
+                    <Text style={styles.previewStep}>{daoLevel.step}</Text>
                     <Text style={styles.daoLevel}>
                         {daoLevel.realm} · {daoLevel.stage}
                     </Text>
@@ -78,6 +80,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     previewName: { fontSize: 22, color: colors.ink, fontFamily: fonts.serif },
+    previewStep: { fontSize: 12, letterSpacing: 1, color: colors.inkSoft, fontFamily: fonts.serif },
     previewLevel: { fontSize: 15, color: colors.seal, fontFamily: fonts.serif },
     daoLevel: { fontSize: 17, color: colors.ink, fontFamily: fonts.serif },
     stats: { flexDirection: 'row', gap: 32 },

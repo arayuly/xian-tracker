@@ -71,6 +71,7 @@ export default function CultivatorsScreen() {
                                     {item.name}
                                     {isMe && <Text style={styles.you}> (ты)</Text>}
                                 </Text>
+                                <Text style={styles.step}>{level.step}</Text>
                                 <Text style={styles.level}>
                                     {level.realm} · {level.stage}
                                 </Text>
@@ -87,6 +88,7 @@ const styles = StyleSheet.create({
     row: { paddingVertical: 14, gap: 4 },
     name: { fontSize: 20, color: colors.ink, fontFamily: fonts.serif },
     you: { fontSize: 14, color: colors.inkSoft },
+    step: { fontSize: 12, letterSpacing: 1, color: colors.inkSoft, fontFamily: fonts.serif },
     level: { fontSize: 14, color: colors.seal, fontFamily: fonts.serif },
     separator: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
     empty: { fontSize: 15, color: colors.inkSoft, fontFamily: fonts.serif },
