@@ -31,7 +31,7 @@ export function PathTrack({
     onBreakthrough,
 }: Props) {
     const [showCelebration, setShowCelebration] = useState(false);
-    const [reached, setReached] = useState({ realm: '', stage: '' });
+    const [reached, setReached] = useState({ step: '', realm: '', stage: '' });
 
     const level = LEVELS[levelIndex];
     const goal = level[goalKey];
@@ -42,14 +42,16 @@ export function PathTrack({
         const next = LEVELS[levelIndex + 1];
         onBreakthrough();
         Vibration.vibrate(60);
-        setReached({ realm: next.realm, stage: next.stage });
+        setReached({ step: next.step, realm: next.realm, stage: next.stage });
         setShowCelebration(true);
     }
 
     return (
         <View style={styles.track}>
             <View>
-                <Text style={styles.label}>{label}</Text>
+                <Text style={styles.label}>
+                    {label} · {level.step}
+                </Text>
                 <Text style={styles.realm}>
                     {level.hanzi ? `${level.realm} · ${level.hanzi}` : level.realm}
                 </Text>
@@ -90,7 +92,7 @@ export function PathTrack({
 
             <BreakthroughModal
                 visible={showCelebration}
-                label={label}
+                label={`${label} · ${reached.step}`}
                 realm={reached.realm}
                 stage={reached.stage}
                 onClose={() => setShowCelebration(false)}
